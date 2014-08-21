@@ -3,7 +3,7 @@ Avatar History
 
 Stores all user avatars in a special photo album ( `Profile Pictures` by default )
 
-** Requirements: **
+**Requirements:**
 
 * Oxwall Photo
 
