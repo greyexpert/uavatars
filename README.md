@@ -8,4 +8,4 @@ Stores all user avatars in a special photo album ( `Profile Pictures` by default
 * Oxwall Photo
 
 Note:
-The plugin will work only for new uploaded avatars
+_The plugin will work only for new uploaded avatars_
