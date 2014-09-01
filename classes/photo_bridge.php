@@ -153,30 +153,6 @@ class UAVATARS_CLASS_PhotoBridge
         return empty($data["photo"]) ? null : $data["photo"];
     }
 
-    public function pullPhoto( $photoId )
-    {
-        if ( !$this->isActive() ) return null;
-
-        $photo = PHOTO_BOL_PhotoService::getInstance()->findPhotoById($photoId);
-
-        if ( empty($photo) )
-        {
-            return null;
-        }
-
-        $source = PHOTO_BOL_PhotoService::getInstance()->getPhotoPath($photo->id, $photo->hash);
-
-        $pluginfilesDir = $this->plugin->getPluginFilesDir();
-        $dist = $pluginfilesDir . uniqid('tmp_') . '.jpg';
-
-        if ( !OW::getStorage()->copyFileToLocalFS($source, $dist) )
-        {
-            return null;
-        }
-
-        return $dist;
-    }
-
     public function isPhotoExists( $photoId )
     {
         if ( !$this->isActive() ) return null;
