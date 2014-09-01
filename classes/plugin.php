@@ -97,7 +97,16 @@ class UAVATARS_CLASS_Plugin
             $uAvatar->userId = $userId;
 
             $avatarPath = $this->avatarService->getAvatarPath($userId, 3);
-            $photoId = $this->photoBridge->addPhoto($userId, $avatarPath);
+            $tmpPath = OW::getPluginManager()->getPlugin("uavatars")
+                    ->getPluginFilesDir() . uniqid("tmp-") . '.jpg';
+            
+            if ( !OW::getStorage()->copyFileToLocalFS($avatarPath, $tmpPath) )
+            {
+                return;
+            }
+            
+            $photoId = $this->photoBridge->addPhoto($userId, $tmpPath);
+            @unlink($tmpPath);
 
             if ( empty($photoId) )
             {
