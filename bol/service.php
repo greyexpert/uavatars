@@ -133,6 +133,11 @@ class UAVATARS_BOL_Service
     {
         return $this->avatarDao->findLastByUserId($userId);
     }
+    
+    public function findListAfterAvatarId( $avatarId, $count, $includes = true )
+    {
+        return $this->avatarDao->findListAfterAvatarId($avatarId, $count, $includes);
+    }
 
     public function findByUserId( $userId, $limit = null )
     {

@@ -113,4 +113,31 @@ class UAVATARS_BOL_AvatarDao extends OW_BaseDao
 
         return $this->findObjectByExample($example);
     }
+    
+    public function findListAfterAvatarId( $avatarId, $count, $includes = true )
+    {
+        $avatar = $this->findLastByAvatarId($avatarId);
+        
+        if ( $avatar === null )
+        {
+            return array();
+        }
+        
+        $example = new OW_Example();
+        $example->andFieldEqual("userId", $avatar->userId);
+        
+        if ( $includes )
+        {
+            $example->andFieldLessOrEqual("timeStamp", $avatar->timeStamp);
+        }
+        else
+        {
+            $example->andFieldLessThan("timeStamp", $avatar->timeStamp);
+        }
+        
+        $example->setOrder("`timeStamp` DESC");
+        $example->setLimitClause(0, $count);
+        
+        return $this->findListByExample($example);
+    }
 }

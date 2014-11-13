@@ -75,6 +75,7 @@ class UAVATARS_CLASS_NewsfeedBridge
 
         $userId = $params['action']['userId'];
         $avatarId = $params['action']['entityId'];
+        
         $avatar = UAVATARS_BOL_Service::getInstance()->findLastByAvatarId($avatarId);
 
         if ( $avatar === null )
@@ -86,8 +87,7 @@ class UAVATARS_CLASS_NewsfeedBridge
         OW::getDocument()->addStyleSheet($staticUrl . 'style.css');
         OW::getDocument()->addScript($staticUrl . 'script.js');
 
-        $avatars = UAVATARS_BOL_Service::getInstance()->findByUserId($userId, array(0, 2));
-
+        $avatars = UAVATARS_BOL_Service::getInstance()->findListAfterAvatarId($avatar->avatarId, 2);
         UAVATARS_CLASS_PhotoBridge::getInstance()->initPhotoFloatBox();
 
         $js = UTIL_JsGenerator::newInstance();

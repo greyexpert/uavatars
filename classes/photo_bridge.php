@@ -160,7 +160,17 @@ class UAVATARS_CLASS_PhotoBridge
         return PHOTO_BOL_PhotoService::getInstance()->findPhotoById($photoId) !== null;
     }
     
-    public function addPhoto( $userId, $filePath, $title = "", $text = null, $addToFeed = false )
+    public function updatePhotoStatus( $photoId, $status )
+    {
+        if ( !$this->isActive() ) return null;
+        
+        $photo = PHOTO_BOL_PhotoService::getInstance()->findPhotoById($photoId);
+        $photo->status = $status;
+        
+        PHOTO_BOL_PhotoDao::getInstance()->save($photo);
+    }
+    
+    public function addPhoto( $userId, $filePath, $title = "", $text = null, $addToFeed = false, $status = null )
     {
         if ( !$this->isActive() ) return null;
         
@@ -176,7 +186,8 @@ class UAVATARS_CLASS_PhotoBridge
             "albumId" => $this->getAlbum($userId),
             "path" => $filePath,
             "description" => $description,
-            "addToFeed" => $addToFeed
+            "addToFeed" => $addToFeed,
+            "status" => $status
         ));
         
         if ( empty($data["photoId"]) )

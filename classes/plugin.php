@@ -89,37 +89,30 @@ class UAVATARS_CLASS_Plugin
         $userId = $params['userId'];
         $avatar = $this->avatarService->findByUserId($userId);
 
-        if ( $params['upload'] )
+        $uAvatar = new UAVATARS_BOL_Avatar;
+        $uAvatar->avatarId = $avatar->id;
+        $uAvatar->userId = $userId;
+
+        $avatarPath = $this->avatarService->getAvatarPath($userId, 3);
+        $tmpPath = OW::getPluginManager()->getPlugin("uavatars")
+                ->getPluginFilesDir() . uniqid("tmp-") . '.jpg';
+
+        if ( !OW::getStorage()->copyFileToLocalFS($avatarPath, $tmpPath) )
         {
-            $uAvatar = new UAVATARS_BOL_Avatar;
-
-            $uAvatar->avatarId = $avatar->id;
-            $uAvatar->userId = $userId;
-
-            $avatarPath = $this->avatarService->getAvatarPath($userId, 3);
-            $tmpPath = OW::getPluginManager()->getPlugin("uavatars")
-                    ->getPluginFilesDir() . uniqid("tmp-") . '.jpg';
-            
-            if ( !OW::getStorage()->copyFileToLocalFS($avatarPath, $tmpPath) )
-            {
-                return;
-            }
-            
-            $photoId = $this->photoBridge->addPhoto($userId, $tmpPath);
-            @unlink($tmpPath);
-
-            if ( empty($photoId) )
-            {
-                return;
-            }
-
-            $uAvatar->photoId = $photoId;
-            $uAvatar->timeStamp = time();
+            return;
         }
-        else
+
+        $photoStatus = $avatar->status == "active" ? "approved" : "approval";
+        $photoId = $this->photoBridge->addPhoto($userId, $tmpPath, "", null, false, $photoStatus);
+        @unlink($tmpPath);
+
+        if ( empty($photoId) )
         {
-            $uAvatar = $this->uAvatarsService->findLastByUserId($userId);
+            return;
         }
+
+        $uAvatar->photoId = $photoId;
+        $uAvatar->timeStamp = time();
 
         $avatarPreview = $this->avatarService->getAvatarPath($userId, 2);
         $fileName = $this->uAvatarsService->storeAvatarImage($avatarPreview);
@@ -136,8 +129,30 @@ class UAVATARS_CLASS_Plugin
         }
 
         $uAvatar->fileName = $fileName;
-
         $this->uAvatarsService->saveAvatar($uAvatar);
+    }
+    
+    public function onAvatarUpdate( OW_Event $event )
+    {
+        $params = $event->getParams();
+        $data = $event->getData();
+                
+        if ( $params['entityType'] != "avatar-change" )
+        {
+            return;
+        }
+        
+        foreach ( $data as $avatarId => $info )
+        {
+            $uAvatar = $this->uAvatarsService->findLastByAvatarId($avatarId);
+            
+            if ( empty($uAvatar) || empty($uAvatar->photoId) )
+            {
+                continue;
+            }
+            
+            $this->photoBridge->updatePhotoStatus($uAvatar->photoId, $info["status"] == "active" ? "approved" : "approval");
+        }
     }
 
     public function onCollectContent( BASE_CLASS_EventCollector $event )
@@ -279,6 +294,8 @@ class UAVATARS_CLASS_Plugin
 
             return;
         }
+        
+        OW::getEventManager()->bind(BOL_ContentService::EVENT_UPDATE_INFO, array($this, 'onAvatarUpdate'));
         
         OW::getEventManager()->bind('base.widget_panel.content.top', array($this, "onCollectContent"));
         OW::getEventManager()->bind('base.after_avatar_change', array($this, 'afterAvatarChange'));
