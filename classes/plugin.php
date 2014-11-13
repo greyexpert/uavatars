@@ -154,6 +154,29 @@ class UAVATARS_CLASS_Plugin
             $this->photoBridge->updatePhotoStatus($uAvatar->photoId, $info["status"] == "active" ? "approved" : "approval");
         }
     }
+    
+    public function onAvatarDelete( OW_Event $event  )
+    {
+        $params = $event->getParams();
+                
+        if ( $params['entityType'] != "avatar-change" )
+        {
+            return;
+        }
+        
+        foreach ( $params['entityIds'] as $avatarId )
+        {
+            $uAvatar = $this->uAvatarsService->findLastByAvatarId($avatarId);
+            
+            if ( empty($uAvatar) || empty($uAvatar->photoId) )
+            {
+                continue;
+            }
+            
+            $this->photoBridge->deletePhoto($uAvatar->photoId);
+            $this->uAvatarsService->deleteAvatar($uAvatar);
+        }
+    }
 
     public function onCollectContent( BASE_CLASS_EventCollector $event )
     {
@@ -296,6 +319,7 @@ class UAVATARS_CLASS_Plugin
         }
         
         OW::getEventManager()->bind(BOL_ContentService::EVENT_UPDATE_INFO, array($this, 'onAvatarUpdate'));
+        OW::getEventManager()->bind(BOL_ContentService::EVENT_DELETE, array($this, 'onAvatarDelete'));
         
         OW::getEventManager()->bind('base.widget_panel.content.top', array($this, "onCollectContent"));
         OW::getEventManager()->bind('base.after_avatar_change', array($this, 'afterAvatarChange'));

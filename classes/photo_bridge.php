@@ -201,6 +201,11 @@ class UAVATARS_CLASS_PhotoBridge
         
         return $photoId;
     }
+    
+    public function deletePhoto( $photoId )
+    {
+        BOL_ContentService::getInstance()->deleteContent("photo_comments", $photoId);
+    }
 
     public function initPhotoFloatBox()
     {
