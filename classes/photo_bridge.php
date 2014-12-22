@@ -139,6 +139,15 @@ class UAVATARS_CLASS_PhotoBridge
         else
         {
             $albumId = $album["id"];
+            
+            if ( $album["entityType"] != $entityType )
+            {
+                $oldAlbum = PHOTO_BOL_PhotoAlbumService::getInstance()->findAlbumById($albumId);
+                $oldAlbum->entityType = $entityType;
+                $oldAlbum->entityId = $entityId;
+                
+                PHOTO_BOL_PhotoAlbumService::getInstance()->updateAlbum($oldAlbum);
+            }
         }
 
         return $albumId;
@@ -183,7 +192,7 @@ class UAVATARS_CLASS_PhotoBridge
         }
         
         $data = OW::getEventManager()->call("photo.add", array(
-            "albumId" => $this->getAlbum($userId),
+            "albumId" => $this->getAlbum($userId, "uavatars", $userId),
             "path" => $filePath,
             "description" => $description,
             "addToFeed" => $addToFeed,
