@@ -306,6 +306,55 @@ class UAVATARS_CLASS_Plugin
             OW::getDocument()->addOnloadScript($js);
         }
     }
+    
+    public function getAvatar( OW_Event $event )
+    {
+        $params = $event->getParams();
+        $avatar = null;
+        
+        if ( !empty($params["avatarId"]) )
+        {
+            $avatar = UAVATARS_BOL_Service::getInstance()->findLastByAvatarId($params["avatarId"]);
+        } 
+        else if ( !empty($params["userId"]) )
+        {
+            $avatar = UAVATARS_BOL_Service::getInstance()->findLastByUserId($params["userId"]);
+        }
+        
+        if ( empty($avatar) )
+        {
+            return null;
+        }
+        
+        $data = array(
+            "id" => $avatar->id,
+            "photoId" => $avatar->photoId,
+            "timeStamp" => $avatar->timeStamp,
+            "image" => UAVATARS_BOL_Service::getInstance()->getAvatarUrl($avatar)
+        );
+        
+        if ( !isset($params["photo"]) || $params["photo"] !== false  )
+        {
+            $photoInfo = UAVATARS_CLASS_PhotoBridge::getInstance()->getPhotoInfo($avatar->photoId);
+            $data["photo"] = array(
+                "url" => $photoInfo["photoUrl"],
+                "data" => null
+            );
+            
+            if ( !empty($photoInfo["dimension"]) )
+            {
+                $data["photo"]["url"] = $photoInfo["previewUrl"];
+                $data["photo"]["data"] = array(
+                    "mainUrl" => $photoInfo["previewUrl"],
+                    "main" => array($photoInfo["dimension"]["main"][0], $photoInfo["dimension"]["main"][1])
+                );
+            }
+        }
+        
+        $event->setData($data);
+        
+        return $data;
+    }
 
     public function init()
     {
@@ -324,6 +373,8 @@ class UAVATARS_CLASS_Plugin
         OW::getEventManager()->bind('base.widget_panel.content.top', array($this, "onCollectContent"));
         OW::getEventManager()->bind('base.after_avatar_change', array($this, 'afterAvatarChange'));
         OW::getEventManager()->bind('uavatars.init_for_node', array($this, 'initForNode'));
+        
+        OW::getEventManager()->bind('uavatars.get_avatar', array($this, 'getAvatar'));
 
         UAVATARS_CLASS_NewsfeedBridge::getInstance()->init();
     }
