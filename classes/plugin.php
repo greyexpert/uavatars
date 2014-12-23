@@ -195,11 +195,7 @@ class UAVATARS_CLASS_Plugin
             return;
         }
         
-        $staticUrl = OW::getPluginManager()->getPlugin('uavatars')->getStaticUrl();
-        OW::getDocument()->addStyleSheet($staticUrl . 'style.css');
-        OW::getDocument()->addScript($staticUrl . 'script.js');
-
-        UAVATARS_CLASS_PhotoBridge::getInstance()->initPhotoFloatBox();
+        UAVATARS_CLASS_Plugin::getInstance()->addStatic();
 
         $js = UTIL_JsGenerator::newInstance();
         $photoInfo = UAVATARS_CLASS_PhotoBridge::getInstance()->getPhotoInfo($avatar->photoId);
@@ -262,11 +258,7 @@ class UAVATARS_CLASS_Plugin
             return;
         }
         
-        $staticUrl = OW::getPluginManager()->getPlugin('uavatars')->getStaticUrl();
-        OW::getDocument()->addStyleSheet($staticUrl . 'style.css');
-        OW::getDocument()->addScript($staticUrl . 'script.js');
-
-        UAVATARS_CLASS_PhotoBridge::getInstance()->initPhotoFloatBox();
+        $this->addStatic();
 
         $js = UTIL_JsGenerator::newInstance();
 
@@ -355,6 +347,16 @@ class UAVATARS_CLASS_Plugin
         
         return $data;
     }
+    
+    public function addStatic()
+    {
+        $plugin = OW::getPluginManager()->getPlugin('uavatars');
+        $staticUrl = $plugin->getStaticUrl();
+        OW::getDocument()->addStyleSheet($staticUrl . 'style.css?' . $plugin->getDto()->build);
+        OW::getDocument()->addScript($staticUrl . 'script.js?' . $plugin->getDto()->build);
+
+        UAVATARS_CLASS_PhotoBridge::getInstance()->initPhotoFloatBox();
+    }
 
     public function init()
     {
@@ -375,6 +377,7 @@ class UAVATARS_CLASS_Plugin
         OW::getEventManager()->bind('uavatars.init_for_node', array($this, 'initForNode'));
         
         OW::getEventManager()->bind('uavatars.get_avatar', array($this, 'getAvatar'));
+        OW::getEventManager()->bind('uavatars.add_static', array($this, 'addStatic'));
 
         UAVATARS_CLASS_NewsfeedBridge::getInstance()->init();
     }

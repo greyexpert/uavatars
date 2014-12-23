@@ -83,12 +83,8 @@ class UAVATARS_CLASS_NewsfeedBridge
             return;
         }
 
-        $staticUrl = OW::getPluginManager()->getPlugin('uavatars')->getStaticUrl();
-        OW::getDocument()->addStyleSheet($staticUrl . 'style.css');
-        OW::getDocument()->addScript($staticUrl . 'script.js');
-
+        UAVATARS_CLASS_Plugin::getInstance()->addStatic();
         $avatars = UAVATARS_BOL_Service::getInstance()->findListAfterAvatarId($avatar->avatarId, 2);
-        UAVATARS_CLASS_PhotoBridge::getInstance()->initPhotoFloatBox();
 
         $js = UTIL_JsGenerator::newInstance();
 
