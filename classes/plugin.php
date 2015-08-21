@@ -328,18 +328,27 @@ class UAVATARS_CLASS_Plugin
         if ( !isset($params["photo"]) || $params["photo"] !== false  )
         {
             $photoInfo = UAVATARS_CLASS_PhotoBridge::getInstance()->getPhotoInfo($avatar->photoId);
-            $data["photo"] = array(
-                "url" => $photoInfo["photoUrl"],
-                "data" => null
-            );
             
-            if ( !empty($photoInfo["dimension"]) )
+            if ( empty($photoInfo) ) 
             {
-                $data["photo"]["url"] = $photoInfo["previewUrl"];
-                $data["photo"]["data"] = array(
-                    "mainUrl" => $photoInfo["previewUrl"],
-                    "main" => array($photoInfo["dimension"]["main"][0], $photoInfo["dimension"]["main"][1])
+                $data["photo"] = null;
+                $data["photoId"] = null;
+            }
+            else
+            {
+                $data["photo"] = array(
+                    "url" => $photoInfo["photoUrl"],
+                    "data" => null
                 );
+                
+                if ( !empty($photoInfo["dimension"]) )
+                {
+                    $data["photo"]["url"] = $photoInfo["previewUrl"];
+                    $data["photo"]["data"] = array(
+                        "mainUrl" => $photoInfo["previewUrl"],
+                        "main" => array($photoInfo["dimension"]["main"][0], $photoInfo["dimension"]["main"][1])
+                    );
+                }
             }
         }
         
