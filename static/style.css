@@ -51,3 +51,7 @@
 .ua-newsfeed-current-avatar img {
     width: 150px;
 }
+
+a.ua-no-photo {
+    cursor: auto;
+}

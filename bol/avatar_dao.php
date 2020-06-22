@@ -99,6 +99,20 @@ class UAVATARS_BOL_AvatarDao extends OW_BaseDao
         return $this->findListByExample($example);
     }
 
+    public function findListByPhotoId( $photoId, $limit = null )
+    {
+        $example = new OW_Example();
+        $example->andFieldEqual('photoId', $photoId);
+        $example->setOrder('timeStamp DESC');
+
+        if ( $limit !== null && count($limit) > 1 )
+        {
+            $example->setLimitClause($limit[0], $limit[1]);
+        }
+
+        return $this->findListByExample($example);
+    }
+
     /**
      *
      * @param int $avatarId

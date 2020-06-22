@@ -364,6 +364,25 @@ class UAVATARS_CLASS_Plugin
         
         return $data;
     }
+
+    public function afterPhotoDelete( OW_Event $event )
+    {
+        $params = $event->getParams();
+        
+        if ( empty($params["id"]) )
+        {
+            return;
+       	}
+       	
+        $photoId = $params["id"];
+        $avatars = $this->uAvatarsService->findByPhotoId($photoId);
+
+        foreach ($avatars as $avatar) {
+            $avatar->photoId = null;
+
+            $this->uAvatarsService->saveAvatar($avatar);
+        }
+    }
     
     public function addStatic()
     {
@@ -395,6 +414,8 @@ class UAVATARS_CLASS_Plugin
         
         OW::getEventManager()->bind('uavatars.get_avatar', array($this, 'getAvatar'));
         OW::getEventManager()->bind('uavatars.add_static', array($this, 'addStatic'));
+
+        OW::getEventManager()->bind("photo.after_delete", array($this, "afterPhotoDelete"));
 
         UAVATARS_CLASS_NewsfeedBridge::getInstance()->init();
     }
