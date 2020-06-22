@@ -174,6 +174,12 @@ class UAVATARS_CLASS_PhotoBridge
         if ( !$this->isActive() ) return null;
         
         $photo = PHOTO_BOL_PhotoService::getInstance()->findPhotoById($photoId);
+
+        if ( empty($photo) )
+        {
+            return;
+        }
+
         $photo->status = $status;
         
         PHOTO_BOL_PhotoDao::getInstance()->save($photo);
