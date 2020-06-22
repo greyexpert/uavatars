@@ -29,4 +29,16 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
+try
+{
+    Updater::getDbo()->query(
+        "ALTER TABLE `" . OW_DB_PREFIX . "uavatars_avatar` CHANGE `photoId` `photoId` INT(11) NULL;"
+    );
+}
+catch (Exception $e)
+{
+    // Skip...
+}
+
 Updater::getLanguageService()->importPrefixFromZip(dirname(__FILE__) . DS . 'langs.zip', 'uavatars');

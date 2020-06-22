@@ -33,7 +33,7 @@ $query = "CREATE TABLE IF NOT EXISTS `" . OW_DB_PREFIX . "uavatars_avatar` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `userId` int(11) NOT NULL,
   `avatarId` int(11) NOT NULL,
-  `photoId` int(11) NOT NULL,
+  `photoId` int(11) DEFAULT NULL,
   `fileName` varchar(255) NOT NULL,
   `timeStamp` int(11) NOT NULL,
   PRIMARY KEY (`id`),

@@ -176,12 +176,17 @@ class UAVATARS_CLASS_Plugin
         {
             $uAvatar = $this->uAvatarsService->findLastByAvatarId($avatarId);
             
-            if ( empty($uAvatar) || empty($uAvatar->photoId) )
+            if ( empty($uAvatar) )
             {
                 continue;
             }
+
+            if ( !empty($uAvatar->photoId) )
+            {
+                $this->photoBridge->deletePhoto($uAvatar->photoId);
+            }
             
-            $this->photoBridge->deletePhoto($uAvatar->photoId);
+            
             $this->uAvatarsService->deleteAvatar($uAvatar);
         }
     }
@@ -206,7 +211,9 @@ class UAVATARS_CLASS_Plugin
         UAVATARS_CLASS_Plugin::getInstance()->addStatic();
 
         $js = UTIL_JsGenerator::newInstance();
-        $photoInfo = UAVATARS_CLASS_PhotoBridge::getInstance()->getPhotoInfo($avatar->photoId);
+        $photoInfo = $avatar->photoId
+            ? UAVATARS_CLASS_PhotoBridge::getInstance()->getPhotoInfo($avatar->photoId)
+            : null;
         
         if ( !empty($photoInfo) )
         {
@@ -270,7 +277,9 @@ class UAVATARS_CLASS_Plugin
 
         $js = UTIL_JsGenerator::newInstance();
 
-        $photoInfo = UAVATARS_CLASS_PhotoBridge::getInstance()->getPhotoInfo($avatar->photoId);
+        $photoInfo = $avatar->photoId
+            ? UAVATARS_CLASS_PhotoBridge::getInstance()->getPhotoInfo($avatar->photoId)
+            : null;
         
         if ( !empty($photoInfo) )
         {
@@ -335,7 +344,9 @@ class UAVATARS_CLASS_Plugin
         
         if ( !isset($params["photo"]) || $params["photo"] !== false  )
         {
-            $photoInfo = UAVATARS_CLASS_PhotoBridge::getInstance()->getPhotoInfo($avatar->photoId);
+            $photoInfo = $avatar->photoId
+                ? UAVATARS_CLASS_PhotoBridge::getInstance()->getPhotoInfo($avatar->photoId)
+                : null;
             
             if ( empty($photoInfo) ) 
             {
@@ -377,10 +388,28 @@ class UAVATARS_CLASS_Plugin
         $photoId = $params["id"];
         $avatars = $this->uAvatarsService->findByPhotoId($photoId);
 
-        foreach ($avatars as $avatar) {
+        foreach ($avatars as $avatar)
+        {
             $avatar->photoId = null;
 
             $this->uAvatarsService->saveAvatar($avatar);
+        }
+    }
+
+    public function onUserUnregister( OW_Event $event )
+    {
+        $params = $event->getParams();
+        
+        if ( empty($params["userId"]) )
+        {
+            return;
+        }
+        
+        $avatars = $this->uAvatarsService->findByUserId($params["userId"]);
+
+        foreach ($avatars as $avatar)
+        {
+            $this->uAvatarsService->deleteAvatar($avatar);
         }
     }
     
@@ -407,6 +436,7 @@ class UAVATARS_CLASS_Plugin
         
         OW::getEventManager()->bind(BOL_ContentService::EVENT_UPDATE_INFO, array($this, 'onAvatarUpdate'));
         OW::getEventManager()->bind(BOL_ContentService::EVENT_DELETE, array($this, 'onAvatarDelete'));
+        OW::getEventManager()->bind(OW_EventManager::ON_USER_UNREGISTER, array($this, "onUserUnregister"));
         
         OW::getEventManager()->bind('base.widget_panel.content.top', array($this, "onCollectContent"));
         OW::getEventManager()->bind('base.after_avatar_change', array($this, 'afterAvatarChange'));

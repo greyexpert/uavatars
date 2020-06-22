@@ -1,6 +1,7 @@
-# Avatar History, 2020-06-22 (2020)
+# Avatar History, 2020-06-22 (2021)
 
 Bug Fixes:
+- Remove avatar history when user is deleted
 - Properly handled photo deletion
 - Added missing language values
 - Fixed photo duplication issue
