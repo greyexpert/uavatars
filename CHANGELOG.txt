@@ -1,3 +1,11 @@
+Avatar History 2010, 2020-06-22:
+
+Bug Fixes:
+- Do not duplicate photos in the avatars album
+- Properly handle photo deletion
+- Add missing language values
+
+
 Avatar History 2000, 2014-12-23:
 
 Enhancements:
