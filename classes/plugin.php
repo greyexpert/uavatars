@@ -89,6 +89,14 @@ class UAVATARS_CLASS_Plugin
         $userId = $params['userId'];
         $avatar = $this->avatarService->findByUserId($userId);
 
+        /**
+         * Dangerously detect photo id from $_POST data
+         * Currently it is the only way to get it
+         */
+        $fromPhotoId = isset($_POST["ajaxFunc"]) && $_POST["ajaxFunc"] === "ajaxCropPhoto" && !empty($_POST["id"])
+            ? (int) $_POST["id"]
+            : null;
+
         $uAvatar = new UAVATARS_BOL_Avatar;
         $uAvatar->avatarId = $avatar->id;
         $uAvatar->userId = $userId;
@@ -103,7 +111,7 @@ class UAVATARS_CLASS_Plugin
         }
 
         $photoStatus = $avatar->status == "active" ? "approved" : "approval";
-        $photoId = $this->photoBridge->addPhoto($userId, $tmpPath, "", null, false, $photoStatus);
+        $photoId = $this->photoBridge->addPhoto($userId, $tmpPath, "", null, false, $photoStatus, $fromPhotoId);
         @unlink($tmpPath);
 
         if ( empty($photoId) )

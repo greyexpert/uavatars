@@ -179,8 +179,15 @@ class UAVATARS_CLASS_PhotoBridge
         PHOTO_BOL_PhotoDao::getInstance()->save($photo);
     }
     
-    public function addPhoto( $userId, $filePath, $title = "", $text = null, $addToFeed = false, $status = null )
-    {
+    public function addPhoto(
+        $userId,
+        $filePath,
+        $title = "",
+        $text = null,
+        $addToFeed = false,
+        $status = null,
+        $fromPhotoId = null
+    ) {
         if ( !$this->isActive() ) return null;
         
         $description = empty($title) ? $text : $title;
@@ -191,8 +198,19 @@ class UAVATARS_CLASS_PhotoBridge
             return;
         }
         
+        $albumId = $this->getAlbum($userId, "uavatars", $userId);
+
+        if ($fromPhotoId)
+        {
+            $photoInfo = $this->getPhotoInfo($fromPhotoId);
+            
+            if ($photoInfo["albumId"] == $albumId) {
+                return $fromPhotoId;
+            }
+        }
+
         $data = OW::getEventManager()->call("photo.add", array(
-            "albumId" => $this->getAlbum($userId, "uavatars", $userId),
+            "albumId" => $albumId,
             "path" => $filePath,
             "description" => $description,
             "addToFeed" => $addToFeed,
