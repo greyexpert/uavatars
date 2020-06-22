@@ -1,12 +1,13 @@
-Avatar History 2010, 2020-06-22:
+# Avatar History, 2020-06-22 (2020)
 
 Bug Fixes:
-- Do not duplicate photos in the avatars album
-- Properly handle photo deletion
-- Add missing language values
+- Properly handled photo deletion
+- Added missing language values
+- Fixed photo duplication issue
+- Minor fixes
 
 
-Avatar History 2000, 2014-12-23:
+# Avatar History, 2014-12-23 (2000)
 
 Enhancements:
 - New programming API: uavatars.get_avatar
@@ -17,7 +18,7 @@ Bug Fixes:
 - Minor fixes
 
 
-Avatar History 1700, 2014-11-26:
+# Avatar History, 2014-11-26 (1700)
 
 Enhancements:
 - Oxwall 1.7.2 support
