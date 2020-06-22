@@ -90,16 +90,19 @@ class UAVATARS_CLASS_NewsfeedBridge
 
         if ( count($avatars) == 1 )
         {
+            $addClass = $avatars[0]->photoId ? "" : "ua-no-photo";
             $avatarUrl = UAVATARS_BOL_Service::getInstance()->getAvatarUrl($avatars[0]);
             $imgUniqId = uniqid('uavatar_');
             $data['content'] =
                 '<div class="ua-newsfeed-avatars-wrap">
-                <a id="' . $imgUniqId . '" class="ua-newsfeed-avatar ua-newsfeed-current-avatar ow_border" href="javascript://">
+                <a id="' . $imgUniqId . '" class="ua-newsfeed-avatar ua-newsfeed-current-avatar ow_border ' . $addClass . '" href="javascript://">
                     <img src="' . $avatarUrl . '" />
                 </a>
                 </div>';
 
-            $photoInfo = UAVATARS_CLASS_PhotoBridge::getInstance()->getPhotoInfo($avatars[0]->photoId);
+            $photoInfo = $avatars[0]->photoId 
+                ? UAVATARS_CLASS_PhotoBridge::getInstance()->getPhotoInfo($avatars[0]->photoId)
+                : null;
             
             if ( !empty($photoInfo) )
             {
@@ -133,21 +136,25 @@ class UAVATARS_CLASS_NewsfeedBridge
         {
             $currentAvatarUrl = UAVATARS_BOL_Service::getInstance()->getAvatarUrl($avatars[0]);
             $prevAvatarUrl = UAVATARS_BOL_Service::getInstance()->getAvatarUrl($avatars[1]);
+            $addClassPrev = $avatars[1]->photoId ? "" : "ua-no-photo";
+            $addClassCurrent = $avatars[0]->photoId ? "" : "ua-no-photo";
 
             $currentUniqId = uniqid('uavatar_');
             $prevUniqId = uniqid('uavatar_');
 
             $data['content'] =
                 '<div class="ua-newsfeed-avatars-wrap">
-                <a id="' . $prevUniqId . '" class="ua-newsfeed-avatar ua-newsfeed-prev-avatar ow_border" href="javascript://">
+                <a id="' . $prevUniqId . '" class="ua-newsfeed-avatar ua-newsfeed-prev-avatar ow_border ' . $addClassPrev . '" href="javascript://">
                     <img src="' . $prevAvatarUrl . '" />
                 </a>
-                <a id="' . $currentUniqId . '" class="ua-newsfeed-avatar ua-newsfeed-current-avatar ow_border" href="javascript://">
+                <a id="' . $currentUniqId . '" class="ua-newsfeed-avatar ua-newsfeed-current-avatar ow_border ' . $addClassCurrent . '" href="javascript://">
                     <img src="' . $currentAvatarUrl . '" />
                 </a>
                 </div>';
 
-            $photoInfo = UAVATARS_CLASS_PhotoBridge::getInstance()->getPhotoInfo($avatars[0]->photoId);
+            $photoInfo = $avatars[0]->photoId
+                ? UAVATARS_CLASS_PhotoBridge::getInstance()->getPhotoInfo($avatars[0]->photoId)
+                : null;
             
             if ( !empty($photoInfo) )
             {
@@ -178,7 +185,9 @@ class UAVATARS_CLASS_NewsfeedBridge
                 ));
             }
 
-            $photoInfo = UAVATARS_CLASS_PhotoBridge::getInstance()->getPhotoInfo($avatars[1]->photoId);
+            $photoInfo = $avatars[1]->photoId
+                ? UAVATARS_CLASS_PhotoBridge::getInstance()->getPhotoInfo($avatars[1]->photoId)
+                : null;
             
             if ( !empty($photoInfo) )
             {

@@ -144,6 +144,11 @@ class UAVATARS_BOL_Service
         return $this->avatarDao->findListByUserId($userId, $limit);
     }
 
+    public function findByPhotoId( $userId, $limit = null )
+    {
+        return $this->avatarDao->findListByPhotoId($userId, $limit = null);
+    }
+
 
     public function getAvatarUrl( UAVATARS_BOL_Avatar $avatar )
     {
